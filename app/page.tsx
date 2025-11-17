@@ -1,6 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import {
+  MdPowerSettingsNew,
+  MdToggleOn,
+  MdToggleOff,
+  MdClose,
+} from "react-icons/md";
 
 export default function Home() {
   const [ip, setIp] = useState("");
@@ -15,7 +21,6 @@ export default function Home() {
       try {
         const res = await fetch(`http://${ip}/distance`);
         const data = await res.json();
-
         setIsNear(data.distance < 20);
       } catch (err) {
         console.log("Sensor offline");
@@ -33,7 +38,7 @@ export default function Home() {
     setConnected(true);
   };
 
-  // ⛔ Input Page UI
+  // PAGE 1 — INPUT SCREEN
   if (!connected) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-700 flex flex-col items-center justify-center p-5 text-white">
@@ -51,14 +56,13 @@ export default function Home() {
             value={ip}
             onChange={(e) => setIp(e.target.value)}
             placeholder="Example: 192.168.1.50"
-            className="w-full px-4 py-2 rounded-md bg-gray-800 border border-gray-600 focus:ring-2 
-            focus:ring-blue-500 outline-none text-white"
+            className="w-full px-4 py-2 rounded-md bg-gray-800 border border-gray-600 
+            focus:ring-2 focus:ring-blue-500 outline-none text-white"
           />
 
           <button
             onClick={handleConnect}
-            className="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-700 rounded-md 
-            text-white font-semibold transition"
+            className="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-semibold transition"
           >
             Connect
           </button>
@@ -67,10 +71,13 @@ export default function Home() {
     );
   }
 
-  // ✅ Connected Page (Gray background + original IMG UI)
+  // PAGE 2 — CONNECTED SENSOR SCREEN
   return (
-    <div className="relative min-h-screen bg-gray-50 text-black">
-      {/* Centered Image */}
+    <div
+      className="relative min-h-screen text-white"
+      style={{ backgroundColor: "#5F5F5F" }}
+    >
+      {/* Center Image */}
       <div className="flex flex-row items-center justify-center h-screen">
         {isNear ? (
           <img src="/IMG4.png" alt="img2" className="h-70 scale-200" />
@@ -79,29 +86,37 @@ export default function Home() {
         )}
       </div>
 
-      {/* Top-left Buttons */}
-      <button
-        onClick={() => setOverride(!override)}
-        className="absolute top-5 left-5 px-4 py-2 bg-black text-white rounded-md z-[200]"
-      >
-        {override ? "Disable Manual" : "Enable Manual"}
-      </button>
-
-      {override && (
+      {/* CIRCULAR FLOATING BUTTONS */}
+      <div className="absolute top-5 left-5 flex flex-col gap-4 z-[200]">
+        {/* Manual Mode Button */}
         <button
-          onClick={() => setIsNear(!isNear)}
-          className="absolute top-16 left-5 px-4 py-2 bg-blue-600 text-white rounded-md z-[200]"
+          onClick={() => setOverride(!override)}
+          className="w-12 h-12 rounded-full bg-black/80 flex items-center justify-center 
+          shadow-lg hover:scale-110 active:scale-95 transition"
         >
-          Toggle Image
+          <MdPowerSettingsNew size={26} />
         </button>
-      )}
 
-      <button
-        onClick={() => setConnected(false)}
-        className="absolute top-28 left-5 px-4 py-2 bg-red-600 text-white rounded-md z-[200]"
-      >
-        Disconnect
-      </button>
+        {/* Toggle Button (ONLY in manual mode) */}
+        {override && (
+          <button
+            onClick={() => setIsNear(!isNear)}
+            className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center 
+            shadow-lg hover:scale-110 active:scale-95 transition"
+          >
+            {isNear ? <MdToggleOn size={30} /> : <MdToggleOff size={30} />}
+          </button>
+        )}
+
+        {/* Disconnect */}
+        <button
+          onClick={() => setConnected(false)}
+          className="w-12 h-12 rounded-full bg-red-600 flex items-center justify-center 
+          shadow-lg hover:scale-110 active:scale-95 transition"
+        >
+          <MdClose size={28} />
+        </button>
+      </div>
     </div>
   );
 }
