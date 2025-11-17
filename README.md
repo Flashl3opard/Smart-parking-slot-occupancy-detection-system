@@ -1,36 +1,127 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🅿️ Parking Slot Detection System
 
-## Getting Started
+A simple and efficient **IoT-based parking slot detection system** using **ESP8266 + Ultrasonic Sensor + Next.js UI**.  
+The system detects whether a car is present in the slot and updates the UI in real-time.
 
-First, run the development server:
+---
+
+## 📸 Project Preview
+
+- Shows **IMG3 / IMG4** based on distance
+- Manual override mode
+- Floating circular icon buttons
+- ESP updates distance every 500ms
+- Clean UI + Real-time feed
+
+---
+
+# ✅ Features
+
+- Real-time ultrasonic distance detection
+- Automatic image switching
+- Manual control override
+- ESP8266 REST API (`/distance`) endpoint
+- Clean modern UI
+- Accepts dynamic IP address input
+- Fully responsive web interface
+
+---
+
+# 📦 Installation & Setup
+
+## 1️⃣ Clone the Repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <your-repository-url>
+cd <project-folder>
+
+in cmd: `npm install` and `npm run dev`
+The project will be live at:
+👉 `http://localhost:3000`
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+🛠️ Circuit Diagram
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Connections (ESP8266 + HC-SR04):
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Sensor Pin ESP8266 Pin
+VCC - 3.3V / Vin
+GND - GND
+TRIG - D5 (GPIO 14)
+ECHO - D6 (GPIO 12)
 
-## Learn More
+Arduino Code (Upload to ESP8266)
 
-To learn more about Next.js, take a look at the following resources:
+```
+#include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+const char* ssid = "YOUR_WIFI";
+const char* password = "YOUR_PASSWORD";
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+ESP8266WebServer server(80);
 
-## Deploy on Vercel
+#define TRIG D5
+#define ECHO D6
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+void setup() {
+  Serial.begin(115200);
+  WiFi.begin(ssid, password);
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+
+  Serial.print("Connecting to WiFi...");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nConnected!");
+  Serial.println(WiFi.localIP());
+
+  server.on("/distance", []() {
+    long duration;
+    digitalWrite(TRIG, LOW);
+    delayMicroseconds(2);
+    digitalWrite(TRIG, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(TRIG, LOW);
+
+    duration = pulseIn(ECHO, HIGH);
+    int distance = duration * 0.034 / 2;
+
+    String json = "{\"distance\": " + String(distance) + "}";
+    server.send(200, "application/json", json);
+  });
+
+  server.begin();
+}
+
+void loop() {
+  server.handleClient();
+}
+```
+
+🌐 Getting the ESP8266 IP Address
+
+Upload the Arduino code
+
+Open Serial Monitor (115200 baud)
+
+Reset the ESP8266
+
+Look for:
+
+```
+Connected!
+192.168.x.x
+```
+
+## 💻 Using the Next.js Dashboard
+
+- Start the Next.js app
+- Enter the ESP8266 IP in the input box
+- Click Connect
+- UI loads with real-time image switching
+- Manual override button lets you toggle manually
+- Floating circular icon buttons for control
