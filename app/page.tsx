@@ -80,9 +80,9 @@ export default function Home() {
       {/* Center Image */}
       <div className="flex flex-row items-center justify-center h-screen">
         {isNear ? (
-          <img src="/IMG4.png" alt="img2" className="h-70 scale-200" />
+          <img src="/IMG6.png" alt="img2" className="h-70 scale-200" />
         ) : (
-          <img src="/IMG3.png" alt="img1" className="h-70 scale-200" />
+          <img src="/IMG5.png" alt="img1" className="h-70 scale-200" />
         )}
       </div>
 
